@@ -3,7 +3,6 @@ from __future__ import print_function
 import os.path
 import pandas as pd
 
-from pprint import pprint
 from googleapiclient import discovery
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials

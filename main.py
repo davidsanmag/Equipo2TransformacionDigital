@@ -1,7 +1,4 @@
 import streamlit as st
-import script_api
-import numpy as np
-import pandas as pd
 
 from script_api import getCatalog, getRemainingPlaces, getStudentID, appendValues, isEnrolled, main
 
