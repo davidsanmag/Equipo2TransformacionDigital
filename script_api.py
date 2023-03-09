@@ -19,7 +19,7 @@ SAMPLE_SPREADSHEET_ID = '1JGpUQbOLdQfJMS8LYeuRx2O25R7x5Y1YoRbuApZZTEk'
 # SAMPLE_RANGE_NAME = '01!A22'
 value_input_option = "USER_ENTERED"
 
-def isEnrolled(creds, matricula):
+def isEnrolled(creds, student_id):
     service = discovery.build('sheets', 'v4', credentials=creds)
 
     # The ID of the spreadsheet to retrieve data from.
@@ -34,7 +34,7 @@ def isEnrolled(creds, matricula):
 
     df = pd.DataFrame(data[1:], columns=data[0])
 
-    if matricula in df.values:
+    if student_id in df.values:
         return True
     return False
 
@@ -56,12 +56,11 @@ def getRemainingPlaces(creds, crn):
 
     values = df[df['CRN'] == crn]['Cupo Restante'].tolist()
     if len(values) > 0:
-        print(values[0])
         return int(values[0])
 
     return False
 
-def getStudentID(creds, matricula):
+def getStudentID(creds, student_id):
     service = discovery.build('sheets', 'v4', credentials=creds)
 
     # The ID of the spreadsheet to retrieve data from.
@@ -75,13 +74,13 @@ def getStudentID(creds, matricula):
     data = response.get('values')
 
     df = pd.DataFrame(data[1:], columns=data[0])
-    if matricula in df.values:
+    if student_id in df.values:
         return True
 
     return False
 
 
-def getCatalogo(creds):
+def getCatalog(creds):
 
     service = discovery.build('sheets', 'v4', credentials=creds)
 
@@ -99,12 +98,12 @@ def getCatalogo(creds):
 
     return df
 
-def appendValues(creds, matricula, crn):
+def appendValues(creds, student_id, crn):
     try:
         service = build('sheets', 'v4', credentials=creds)
         values = [
             [
-                matricula, crn
+                student_id, crn
             ],
             # Additional rows ...
         ]
@@ -117,7 +116,6 @@ def appendValues(creds, matricula, crn):
         result = sheet.values().append(
             spreadsheetId=SAMPLE_SPREADSHEET_ID,
             range='ListadoCompletoTest!A2:B', valueInputOption=value_input_option, body=body).execute()
-        print(f"{result.get('updatedCells')} cells updated.")
         return result
 
     except HttpError as err:
