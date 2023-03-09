@@ -1,6 +1,7 @@
 from __future__ import print_function
 
 import os.path
+import pandas as pd
 
 from pprint import pprint
 from googleapiclient import discovery
@@ -18,6 +19,8 @@ SAMPLE_SPREADSHEET_ID = '1JGpUQbOLdQfJMS8LYeuRx2O25R7x5Y1YoRbuApZZTEk'
 # SAMPLE_RANGE_NAME = '01!A22'
 value_input_option = "USER_ENTERED"
 
+
+
 def getCatalogo(creds):
 
     service = discovery.build('sheets', 'v4', credentials=creds)
@@ -26,20 +29,24 @@ def getCatalogo(creds):
     spreadsheet_id = SAMPLE_SPREADSHEET_ID  # TODO: Update placeholder value.
 
     # The A1 notation of the values to retrieve.
-    range_ = 'LOGIN!A2:C158'  # TODO: Update placeholder value.
+    range_ = 'LOGIN'  # TODO: Update placeholder value.
 
     request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
     response = request.execute()
+    data = response.get('values')
+
+    df = pd.DataFrame(data[1:], columns=data[0])
 
     # TODO: Change code below to process the `response` dict:
-    pprint(response)
+    pprint(type(data))
+    return df
 
-def appendValues(creds, matricula):
+def appendValues(creds, matricula, crn):
     try:
         service = build('sheets', 'v4', credentials=creds)
         values = [
             [
-                matricula
+                matricula, crn
             ],
             # Additional rows ...
         ]
@@ -51,7 +58,7 @@ def appendValues(creds, matricula):
         sheet = service.spreadsheets()
         result = sheet.values().append(
             spreadsheetId=SAMPLE_SPREADSHEET_ID,
-            range='01!A22', valueInputOption=value_input_option, body=body).execute()
+            range='ListadoCompletoTest!A2:B', valueInputOption=value_input_option, body=body).execute()
         print(f"{result.get('updatedCells')} cells updated.")
         return result
 
