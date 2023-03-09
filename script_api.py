@@ -19,6 +19,66 @@ SAMPLE_SPREADSHEET_ID = '1JGpUQbOLdQfJMS8LYeuRx2O25R7x5Y1YoRbuApZZTEk'
 # SAMPLE_RANGE_NAME = '01!A22'
 value_input_option = "USER_ENTERED"
 
+def isEnrolled(creds, matricula):
+    service = discovery.build('sheets', 'v4', credentials=creds)
+
+    # The ID of the spreadsheet to retrieve data from.
+    spreadsheet_id = SAMPLE_SPREADSHEET_ID  # TODO: Update placeholder value.
+
+    # The A1 notation of the values to retrieve.
+    range_ = 'ListadoCompletoTest!A:A'  # TODO: Update placeholder value.
+
+    request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
+    response = request.execute()
+    data = response.get('values')
+
+    df = pd.DataFrame(data[1:], columns=data[0])
+
+    if matricula in df.values:
+        return True
+    return False
+
+
+def getRemainingPlaces(creds, crn):
+    service = discovery.build('sheets', 'v4', credentials=creds)
+
+    # The ID of the spreadsheet to retrieve data from.
+    spreadsheet_id = SAMPLE_SPREADSHEET_ID  # TODO: Update placeholder value.
+
+    # The A1 notation of the values to retrieve.
+    range_ = 'CUPO'  # TODO: Update placeholder value.
+
+    request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
+    response = request.execute()
+    data = response.get('values')
+
+    df = pd.DataFrame(data[1:], columns=data[0])
+
+    values = df[df['CRN'] == crn]['Cupo Restante'].tolist()
+    if len(values) > 0:
+        print(values[0])
+        return int(values[0])
+
+    return False
+
+def getStudentID(creds, matricula):
+    service = discovery.build('sheets', 'v4', credentials=creds)
+
+    # The ID of the spreadsheet to retrieve data from.
+    spreadsheet_id = SAMPLE_SPREADSHEET_ID  # TODO: Update placeholder value.
+
+    # The A1 notation of the values to retrieve.
+    range_ = 'Historial!A:A'  # TODO: Update placeholder value.
+
+    request = service.spreadsheets().values().get(spreadsheetId=spreadsheet_id, range=range_)
+    response = request.execute()
+    data = response.get('values')
+
+    df = pd.DataFrame(data[1:], columns=data[0])
+    if matricula in df.values:
+        return True
+
+    return False
 
 
 def getCatalogo(creds):
@@ -37,8 +97,6 @@ def getCatalogo(creds):
 
     df = pd.DataFrame(data[1:], columns=data[0])
 
-    # TODO: Change code below to process the `response` dict:
-    pprint(type(data))
     return df
 
 def appendValues(creds, matricula, crn):
@@ -88,15 +146,6 @@ def main():
         with open('token.json', 'w') as token:
             token.write(creds.to_json())
     return creds
-    # while True:
-    #     x = input()
-    #     if x == 'p':
-    #         appendValues(creds, 'A01720623', 'Ricardo Jasso', 'ITC', 'Octavo Semestre', 'Acreditado(a)', 'TEC21', 'Monterrey')
 
 if __name__ == '__main__':
     main()
-
-    # while True:
-    #     x = input()
-    #     if x == 'p':
-            # appendValues(credentials, 'A01720623', 'Ricardo Jasso', 'ITC', 'Octavo Semestre', 'Acreditado(a)', 'TEC21', 'Monterrey')
